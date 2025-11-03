@@ -27,9 +27,11 @@ function decodedObject(dataString, curentPosition) {
   curentPosition++;
   const nestedObject = [];
   while (dataString[curentPosition] !== 'e') {
-    nestedObject.push(decodeElement(dataString, curentPosition));
-    curentPosition++;
+    const decodedPart = decodeElement(dataString, curentPosition);
+    nestedObject.push(decodedPart);
+    curentPosition += encoding(decodedPart).length;
   }
+
   return nestedObject;
 }
 
@@ -44,25 +46,18 @@ function stringValue(dataString, curentPosition) {
 
 function decodeElement(dataString, curentPosition) {
   const currentElement = dataString[curentPosition];
-  console.log(currentElement, "hii");
+
   switch (currentElement) {
     case "i": return decodedNumber(dataString, curentPosition);
-    case "l": {
-      console.log(curentPosition, "hu");
-      return decodedObject(dataString, curentPosition);
-    }
-    default:
-      console.log("i was here ", curentPosition);
-      return stringValue(dataString + "", curentPosition);
+    case "l": return decodedObject(dataString, curentPosition);
   }
+  return stringValue(dataString + "", curentPosition);
 }
 
 function decoding(dataString) {
   const decodedArray = [];
   let curentPosition = 0;
-
-  const parsed = decodeElement(dataString, curentPosition);;
-
+  const parsed = decodeElement(dataString, curentPosition);
   if (typeof parsed === "object") {
     for (let item of parsed) {
       decodedArray.push(item);
@@ -82,7 +77,7 @@ function formatText(inputs, actualOutput, expectedOutput) {
 function testCode(description, userinput, expectedOutput) {
   const actualOutput = decoding(userinput);
   console.log(actualOutput);
-  // console.log(expectedOutput);
+  console.log(expectedOutput);
   const isEqual = actualOutput === expectedOutput;
   const symbol = isEqual ? "✅" : "❌";
 
